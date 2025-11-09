@@ -153,3 +153,56 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 // ... (All previous JS code remains the same: 3D, Voice, GSAP, Theme, Form)
+// Remove the old fetch — Formspree auto-handles
+document.getElementById('contact-form').addEventListener('submit', (e) => {
+  // Optional: Add loading state
+  const btn = e.target.querySelector('button');
+  btn.textContent = 'Sending...';
+  setTimeout(() => btn.textContent = 'Sent!', 2000);
+});
+// Language System
+const translations = {};
+let currentLang = 'en';
+
+async function loadLanguage(lang) {
+  try {
+    const res = await fetch(`lang/${lang}.json`);
+    translations[lang] = await res.json();
+    applyTranslations(lang);
+    currentLang = lang;
+    updateFlag(lang);
+    localStorage.setItem('lang', lang);
+  } catch (e) { console.log("Lang not found"); }
+}
+
+function applyTranslations(lang) {
+  const t = translations[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) el.textContent = t[key];
+  });
+}
+
+function updateFlag(lang) {
+  const flags = { en: '🇺🇸', es: '🇪🇸', fr: '🇫🇷', de: '🇩🇪', zh: '🇨🇳' };
+  const names = { en: 'EN', es: 'ES', fr: 'FR', de: 'DE', zh: '中文' };
+  document.getElementById('lang-flag').textContent = flags[lang];
+  document.getElementById('lang-name').textContent = names[lang];
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('lang') || navigator.language.split('-')[0];
+  loadLanguage(['en','es','fr','de','zh'].includes(saved) ? saved : 'en');
+
+  // Toggle
+  const btn = document.getElementById('lang-btn');
+  const menu = document.getElementById('lang-menu');
+  btn.addEventListener('click', () => menu.classList.toggle('show'));
+  menu.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      loadLanguage(b.dataset.lang);
+      menu.classList.remove('show');
+    });
+  });
+});
