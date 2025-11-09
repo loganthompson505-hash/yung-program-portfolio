@@ -20,25 +20,103 @@ body {
   line-height: 1.7;
   transition: background 0.4s;
 }
+/* MATURED 3D HERO - PROFESSIONAL & ELEGANT */
+.hero-mature {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+}
 
-#hero-3d { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; }
+#hero-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+}
 
-.hero {
+.hero-content {
+  position: relative;
+  z-index: 10;
   text-align: center;
-  padding: 150px 20px 100px;
+  color: white;
+  max-width: 800px;
+  padding: 2rem;
 }
-h1 {
-  font-family: 'Orbitron', sans-serif;
+
+.hero-content h1 {
   font-size: 4.5rem;
-  font-weight: 900;
-  letter-spacing: 6px;
+  font-weight: 800;
+  margin: 0 0 1rem;
+  background: linear-gradient(90deg, #e0e0e0, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -2px;
+  animation: fadeInUp 1s ease-out;
 }
-.neon {
-  color: var(--accent);
-  text-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent);
-  animation: pulse 2s infinite;
+
+.tagline {
+  font-size: 1.4rem;
+  margin: 0 0 2rem;
+  opacity: 0.9;
+  font-weight: 400;
+  animation: fadeInUp 1s ease-out 0.3s both;
 }
-@keyframes pulse { 50% { opacity: 0.8; } }
+
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 1s ease-out 0.6s both;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  min-width: 160px;
+}
+
+.btn-primary {
+  background: rgba(0, 255, 136, 0.15);
+  color: #00ff88;
+  border: 2px solid #00ff88;
+}
+
+.btn-primary:hover {
+  background: #00ff88;
+  color: black;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+  transform: translateY(-3px);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .tagline { font-size: 1.4rem; opacity: 0.9; margin-top: 10px; }
 
 section { padding: 100px 20px; max-width: 1200px; margin: 0 auto; }

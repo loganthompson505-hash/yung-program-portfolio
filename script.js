@@ -1,44 +1,98 @@
-// 3D Hero (Same as before)
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-renderer.setSize(innerWidth, innerHeight);
-document.getElementById('hero-3d').appendChild(renderer.domElement);
+// MATURED 3D HERO: Glass Orb + Physics + Dynamic Light
+if (document.getElementById('hero-canvas')) {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  let width, height, mouse = { x: 0, y: 0 }, orb = {}, particles = [];
 
-const geometry = new THREE.TorusKnotGeometry(8, 2.5, 200, 16);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ffea, wireframe: true });
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
-camera.position.z = 30;
+  function init() {
+    resize();
+    orb = {
+      x: width * 0.3,
+      y: height * 0.5,
+      targetX: width * 0.3,
+      targetY: height * 0.5,
+      radius: 120,
+      ease: 0.05
+    };
 
-function animate() {
-  requestAnimationFrame(animate);
-  mesh.rotation.x += 0.005;
-  mesh.rotation.y += 0.008;
-  renderer.render(scene, camera);
+    particles = [];
+    for (let i = 0; i < 30; i++) {
+      particles.push({
+        x: width * 0.3 + (Math.random() - 0.5) * 200,
+        y: height * 0.5 + (Math.random() - 0.5) * 200,
+        size: Math.random() * 2 + 1,
+        opacity: 0,
+        targetOpacity: Math.random() * 0.4 + 0.2,
+        speed: 0.02
+      });
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+
+    animate();
+  }
+
+  function resize() {
+    width = canvas.width = canvas.offsetWidth;
+    height = canvas.height = canvas.offsetHeight;
+  }
+
+  function animate() {
+    ctx.fillStyle = 'rgba(15, 15, 30, 0.05)';
+    ctx.fillRect(0, 0, width, height);
+
+    const dx = mouse.x - orb.x;
+    const dy = mouse.y - orb.y;
+    orb.targetX += dx * 0.001;
+    orb.targetY += dy * 0.001;
+
+    orb.x += (orb.targetX - orb.x) * orb.ease;
+    orb.y += (orb.targetY - orb.y) * orb.ease;
+
+    const time = Date.now() * 0.001;
+    const lightX = orb.x + Math.cos(time) * 50;
+    const lightY = orb.y + Math.sin(time * 0.7) * 50;
+
+    const gradient = ctx.createRadialGradient(lightX, lightY, 0, orb.x, orb.y, orb.radius);
+    gradient.addColorStop(0, 'rgba(0, 255, 136, 0.8)');
+    gradient.addColorStop(0.3, 'rgba(0, 212, 255, 0.4)');
+    gradient.addColorStop(1, 'rgba(10, 10, 30, 0.1)');
+
+    ctx.fillStyle = gradient;
+    ctx.shadowBlur = 80;
+    ctx.shadowColor = '#00ff88';
+    ctx.beginPath();
+    ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(0, 255, 136, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    particles.forEach(p => {
+      p.opacity += (p.targetOpacity - p.opacity) * p.speed;
+      const dist = Math.hypot(p.x - orb.x, p.y - orb.y);
+      if (dist < 200) p.opacity = Math.max(p.opacity, 0.4);
+
+      ctx.fillStyle = `rgba(0, 255, 136, ${p.opacity})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      p.x += (orb.x - p.x) * 0.001;
+      p.y += (orb.y - p.y) * 0.001;
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('resize', resize);
+  init();
 }
-animate();
-
-window.addEventListener('resize', () => {
-  camera.aspect = innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-});
-
-// Tilt Effect
-VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
-  max: 15, speed: 400, glare: true, "max-glare": 0.3
-});
-
-// GSAP Animations
-gsap.from('.hero h1', { y: -80, opacity: 0, duration: 1.2, ease: 'bounce.out' });
-gsap.from('.tagline', { opacity: 0, delay: 0.8, duration: 1 });
-gsap.utils.toArray('.project-card, .img-card').forEach((el, i) => {
-  gsap.from(el, {
-    scrollTrigger: { trigger: el, start: 'top 85%' },
-    y: 100, opacity: 0, duration: 0.8, delay: i * 0.15
-  });
-});
 
 // Theme Toggle
 const toggle = document.getElementById('theme-toggle');
